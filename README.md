@@ -631,6 +631,8 @@ npm install
 npm run dev
 ```
 
+**Live site:** [https://xuankhanh1612.github.io/Awesome-FDE-Roadmap/](https://xuankhanh1612.github.io/Awesome-FDE-Roadmap/) — automatically built and published by [`.github/workflows/static.yml`](.github/workflows/static.yml) on every push to `main`.
+
 The interface is a design study of [Designed to Scale](https://designed-to-scale.vercel.app/#/) by Dilum Sanjaya; all lesson prose, diagrams and code here are independently authored. Content in `web/src/data/roadmap.json` is generated directly from this `README.md`. See [`web/README.md`](web/README.md) for commands, features and the project map.
 
 ---
