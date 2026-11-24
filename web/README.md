@@ -33,6 +33,23 @@ npm run preview   # serve the production build
 
 `npm run dev` and `npm run build` regenerate `roadmap.json` automatically. The generated JSON is committed so static hosting works without Node at runtime.
 
+## Deploy to GitHub Pages
+
+The site is published at [https://xuankhanh1612.github.io/Awesome-FDE-Roadmap/](https://xuankhanh1612.github.io/Awesome-FDE-Roadmap/). [`.github/workflows/static.yml`](../.github/workflows/static.yml) runs on every push to `main`:
+
+1. installs `web/` dependencies with `npm ci`;
+2. validates the bilingual content;
+3. builds with `VITE_BASE=/Awesome-FDE-Roadmap/` so assets resolve under the repository subpath;
+4. uploads `web/dist` and deploys through `actions/deploy-pages`.
+
+`public/.nojekyll` is copied into `dist/` to keep GitHub Pages from running Jekyll. To reproduce the production build locally:
+
+```sh
+VITE_BASE=/Awesome-FDE-Roadmap/ npm run build
+```
+
+Hash-based deep links (`#/<lesson-id>/<step>`) keep working under the project path without extra rewrite rules.
+
 ## What is inside
 
 - **Learn** — 21 lessons in 9 chapters, 84 bilingual (EN/VI) steps, each with its own animated diagram state, metrics, key idea and learning goals. Deep links use `#/<lesson-id>/<step>`.
@@ -55,3 +72,5 @@ Interface: English / Vietnamese toggle, light / dark theme, `localStorage` progr
 | `src/styles.css` | Design tokens and responsive layout |
 | `scripts/build-content.mjs` | README → JSON extractor |
 | `scripts/validate-content.mjs` | Content invariants |
+| `public/.nojekyll` | Disables Jekyll processing on GitHub Pages |
+| `../.github/workflows/static.yml` | Automatic build + Pages deployment |
