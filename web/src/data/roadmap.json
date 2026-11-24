@@ -1,0 +1,391 @@
+{
+  "source": "README.md",
+  "templates": [
+    {
+      "id": 1,
+      "title": "The \"Site Survey\" (Discovery Report)",
+      "note": "Used in Week 1 to document the \"messy reality\" before you start building.",
+      "language": "markdown",
+      "code": "### 🕵️ Site Survey: [Client Name] - [Project Name]\n**Date:** YYYY-MM-DD | **Lead FDE:** [Your Name]\n\n#### 1. The Data Landscape (The Ground Truth)\n- **Source Systems:** [e.g., On-prem SQL Server 2016, SAP HANA, Unstructured Sharepoint]\n- **Data Gravity:** [e.g., 5TB total, growing at 50GB/day. Must stay within EU regions.]\n- **Known Quality Issues:** [e.g., Missing timestamps in 30% of records, no primary keys in CRM.]\n\n#### 2. Technical & Security Constraints\n- **Identity:** [e.g., Client uses Okta for OIDC. Need to integrate with GCP IAM.]\n- **Connectivity:** [e.g., No public internet. Must use Cloud Interconnect + Private Google Access.]\n- **Exfiltration Risks:** VPC Service Controls (VPC SC) are active. Need to request perimeter bridges.\n\n#### 3. The \"Delta\" (The Gap)\n- **Product Gap:** Core product doesn't support the client's proprietary `.xyz` file format.\n- **Proposed Glue:** Build a custom GCF (Cloud Function) parser to convert `.xyz` to Parquet.\n\n#### 4. The Quick Win (Week 2 Objective)\n- [e.g., Stand up an Agent Search instance on the 'Policy' dataset to prove 90% retrieval accuracy.]"
+    },
+    {
+      "id": 2,
+      "title": "The Technical Scoping & PRD",
+      "note": "The \"Contract\" that defines what success looks like.",
+      "language": "markdown",
+      "code": "### 📐 Technical Scoping Document: [Feature Name]\n\n#### 1. Objective & User Persona\nEnable **[User Group, e.g., Risk Analysts]** to perform **[Action, e.g., Fraud Investigation]** by leveraging **[Technology, e.g., Multi-Agent ADK Swarm]**.\n\n#### 2. Definition of Success (The Evals)\n*Success is not \"it works\"; success is measurable:*\n- **Retrieval:** >90% Hit Rate on Top-3 documents.\n- **Latency:** End-to-end agent reasoning < 5 seconds.\n- **Groundedness:** 0% Hallucination rate on Golden Dataset (manually verified by Client).\n\n#### 3. Phased Deployment Strategy\n- **Phase 1 (MVP):** Manual trigger agent on Cloud Run using BigQuery static export.\n- **Phase 2 (Scale):** Automated trigger via Pub/Sub on real-time data stream.\n\n#### 4. Out of Scope\n- Integration with the legacy AS400 mainframe (deferred to Q3)."
+    },
+    {
+      "id": 3,
+      "title": "The Agentic Deployment Architecture (GCP)",
+      "note": "A Mermaid/Excalidraw diagram showing a modern, high-scale FDE deployment.",
+      "language": "mermaid",
+      "code": "graph LR\n    subgraph \"Client Environment (On-Prem)\"\n        DB[(Legacy SQL)] -- Cloud Interconnect --> B\n    end\n\n    subgraph \"GCP Landing Zone\"\n        B[Cloud Storage / GCS] --> C(Agent Search)\n        C --> D{ADK on Agent Runtime}\n        \n        subgraph \"Multi-Agent Swarm\"\n            D --> E[Planner Agent]\n            D --> F[SQL Coder Agent]\n            D --> G[Reviewer Agent]\n        end\n        \n        F -- Query --> H[(BigQuery)]\n        E -- Grounding --> C\n    end\n\n    subgraph \"Security Layer\"\n        I[VPC Service Controls]\n        J[Identity-Aware Proxy]\n    end\n\n    User((User)) --> J --> D"
+    },
+    {
+      "id": 4,
+      "title": "The Executive Status Report (The \"WES\")",
+      "note": "The weekly document that justifies the contract renewal.",
+      "language": "markdown",
+      "code": "## 🛰️ Weekly Executive Summary: [Project Name]\n**Reporting Period:** [Date Range] | **Status:** 🟢 GREEN\n\n#### 🚀 Value Delivered This Week\n- **Metric Move:** Reduced manual data lookup time for Analysts by **40%** via the new Search Agent.\n- **Milestone:** Successfully cleared the Security Review for the GKE Private Cluster.\n- **Ingestion:** 1.2B rows of historical logs moved into BigQuery; partitioning optimized for cost.\n\n#### ⚠️ Risks & Strategic Blockers\n- **Risk:** Client IT team has delayed the Firewall port opening for the VPN.\n- **Impact:** Potential 3-day slide on the \"Real-time\" dashboard milestone.\n- **Action Required:** Need [Executive Sponsor Name] to approve the exception ticket #12345.\n\n#### 🗓️ The \"Day 30\" Horizon\n- Finalize **Pairwise Evaluation** run for the production agent.\n- Transition 1st-line support to the internal Client Ops team."
+    }
+  ],
+  "glossary": [
+    {
+      "group": "Foundational Concepts (The \"Forward\" in FDE)",
+      "term": "The Delta",
+      "definition": "Pioneered by Palantir, this refers to the \"gap\" between what a product does out-of-the-box and the specific engineering required to make it solve a client's mission.",
+      "links": []
+    },
+    {
+      "group": "Foundational Concepts (The \"Forward\" in FDE)",
+      "term": "Productized Consulting",
+      "definition": "The philosophy of solving a client’s unique problem through code that can eventually be abstracted back into the core product features.",
+      "links": []
+    },
+    {
+      "group": "Foundational Concepts (The \"Forward\" in FDE)",
+      "term": "Embedded Engineering",
+      "definition": "Unlike a consultant who \"advises,\" an FDE is embedded—they have client credentials, sit in client Slack channels, and ship code directly into the client’s production environment.",
+      "links": []
+    },
+    {
+      "group": "Foundational Concepts (The \"Forward\" in FDE)",
+      "term": "Last-Mile Integration",
+      "definition": "The complex work of stitching a modern SaaS/AI platform into legacy, often undocumented, \"messy\" enterprise systems.",
+      "links": []
+    },
+    {
+      "group": "The Technical & Infra Stack (GCP & Beyond)",
+      "term": "Air-Gap / Tactical Edge",
+      "definition": "Environments with zero or intermittent internet connectivity (Common in Defense/Energy). Requires local container registries and offline model weights. See the Air-Gapped & Tactical Edge Deployment section for the full playbook.",
+      "links": []
+    },
+    {
+      "group": "The Technical & Infra Stack (GCP & Beyond)",
+      "term": "VPC Service Controls (VPC SC)",
+      "definition": "A GCP security perimeter that prevents data exfiltration by restricting access to Google-managed services (like BigQuery or Agent Platform) only from authorized networks.",
+      "links": []
+    },
+    {
+      "group": "The Technical & Infra Stack (GCP & Beyond)",
+      "term": "Hardening",
+      "definition": "The process of moving a prototype from \"it works on my machine\" to \"it meets SOC2/HIPAA security standards,\" including encryption at rest/transit and least-privilege IAM roles.",
+      "links": []
+    },
+    {
+      "group": "The Technical & Infra Stack (GCP & Beyond)",
+      "term": "Shadow IT",
+      "definition": "Unauthorized tools or \"rogue\" databases used by client employees. This is often where the \"cleanest\" and most useful data actually lives.",
+      "links": []
+    },
+    {
+      "group": "The Technical & Infra Stack (GCP & Beyond)",
+      "term": "System of Record (SoR)",
+      "definition": "The authoritative data source for a given piece of information (e.g., SAP for finance, Salesforce for CRM). FDEs must identify this to avoid building on \"stale\" data replicas.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Gemini Enterprise Agent Platform (formerly Vertex AI)",
+      "definition": "Google's umbrella brand (announced at Google Cloud Next '26) for the full agent-building stack — Model Garden, Agent Studio, Agent Runtime, Agent Search, Vector Search, Evals, Model Monitoring, and more. Existing Vertex AI SDKs, APIs (aiplatform.v1beta1.), and billing are unchanged; only the product-level branding and console UI have moved.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Agent Runtime (formerly Vertex AI Agent Engine)",
+      "definition": "The managed, auto-scaling runtime for deploying agents built with ADK, LangChain, LangGraph, or any Python framework. Sits under \"Scale\" in the Agent Platform console alongside Memory Bank and Sessions.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Agents CLI",
+      "definition": "Launched in Alpha at Google Cloud Next '26 (April 22, 2026), an opinionated CLI + seven-skill package (google-agents-cli-workflow, -scaffold, -adk-code, -eval, -deploy, -publish, -observability) that turns any AI coding tool (Claude Code, Gemini CLI, Cursor, Codex, Antigravity) into an ADK-lifecycle expert — and also runs standalone from the terminal. Installed via uvx google-agents-cli setup.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Agent2Agent (A2A) Protocol",
+      "definition": "An open standard used in the Google Agent Development Kit (ADK) that allows autonomous agents to discover, hand off tasks, and communicate with one another across systems.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Workflow Agents",
+      "definition": "Deterministic agents in ADK (SequentialAgent, ParallelAgent, LoopAgent) that follow fixed logic paths rather than relying on an LLM to \"plan\" the next step.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Grounding",
+      "definition": "The process of connecting an LLM to \"Ground Truth\" data (via RAG or Google Search) to ensure its responses are factual and cite-able.",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Pairwise Evaluation (formerly AutoSxS)",
+      "definition": "A GCP-native evaluation method where an \"Autorater\" LLM compares two model outputs and provides a structured judgment on which is better and why. Runs inside Gemini Enterprise Agent Platform Evals (formerly Vertex AI Gen AI Evaluation Service).",
+      "links": []
+    },
+    {
+      "group": "The AI & Agentic Layer (ADK & Evals)",
+      "term": "Faithfulness (RAGAS Metric)",
+      "definition": "A measure of how much the answer is derived only from the retrieved context, essentially a \"hallucination score\".",
+      "links": []
+    },
+    {
+      "group": "Strategic Consulting (Boardroom Language)",
+      "term": "SOW (Statement of Work)",
+      "definition": "The legally binding \"fence\" around your project. If it’s not in the SOW, it’s \"Scope Creep\".",
+      "links": []
+    },
+    {
+      "group": "Strategic Consulting (Boardroom Language)",
+      "term": "MSA (Master Services Agreement)",
+      "definition": "The high-level contract between your company and the client that defines the legal relationship before any specific work starts.",
+      "links": []
+    },
+    {
+      "group": "Strategic Consulting (Boardroom Language)",
+      "term": "Cost of Inaction (CoI)",
+      "definition": "A strategic argument used to drive projects forward by quantifying how much money/efficiency the client loses every day they don't deploy the solution.",
+      "links": []
+    },
+    {
+      "group": "Strategic Consulting (Boardroom Language)",
+      "term": "UAT (User Acceptance Testing)",
+      "definition": "The \"moment of truth\" where actual client employees use the tool. If they don't \"accept\" it, the project isn't done, regardless of how good the code is.",
+      "links": []
+    },
+    {
+      "group": "Strategic Consulting (Boardroom Language)",
+      "term": "Day 2 Operations",
+      "definition": "Everything that happens after the FDE leaves. Includes monitoring, retraining models, and training the client's internal \"Run Team\".",
+      "links": []
+    }
+  ],
+  "resources": [
+    {
+      "group": "The FDE \"Canon\" (Core Books)",
+      "title": "Designing Data-Intensive Applications",
+      "url": "https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/",
+      "note": "(Martin Kleppmann): The \"Bible\". If you only read one book on this list, make it this one. It explains the why behind every database and distributed system you will use on GCP."
+    },
+    {
+      "group": "The FDE \"Canon\" (Core Books)",
+      "title": "The Trusted Advisor",
+      "url": "https://trustedadvisor.com/books/the-trusted-advisor",
+      "note": "(David Maister): FDEs fail more often due to broken trust than broken code. This book teaches you how to move from a \"vendor\" to a \"strategic partner\"."
+    },
+    {
+      "group": "The FDE \"Canon\" (Core Books)",
+      "title": "The Pyramid Principle",
+      "url": "https://www.amazon.com/Pyramid-Principle-Logic-Writing-Thinking/dp/0273710516",
+      "note": "(Barbara Minto): The McKinsey standard for communication. Learn to lead with the conclusion and support it with data—essential for talking to client executives."
+    },
+    {
+      "group": "The FDE \"Canon\" (Core Books)",
+      "title": "Enterprise Integration Patterns",
+      "url": "https://www.enterpriseintegrationpatterns.com/",
+      "note": "(Gregor Hohpe): Essential for Phase 2. It teaches you how to \"glue\" legacy systems together using messaging, gateways, and translators."
+    },
+    {
+      "group": "The FDE \"Canon\" (Core Books)",
+      "title": "Staff Engineer: Leadership beyond the management track",
+      "url": "https://staffeng.com/book",
+      "note": "(Will Larson): FDE is often a \"Staff-plus\" role in terms of scope. This book helps you navigate the high-level technical leadership required at client sites."
+    },
+    {
+      "group": "The Fundamental Whitepapers",
+      "title": "The Google File System (2003)",
+      "url": "https://research.google.com/archive/gfs-sosp2003.pdf",
+      "note": ": The ancestor of GCS (Google Cloud Storage)."
+    },
+    {
+      "group": "The Fundamental Whitepapers",
+      "title": "Bigtable: A Distributed Storage System for Structured Data (2006)",
+      "url": "https://research.google.com/archive/bigtable-osdi06.pdf",
+      "note": ": The foundation of NoSQL on GCP."
+    },
+    {
+      "group": "The Fundamental Whitepapers",
+      "title": "Attention Is All You Need (2017)",
+      "url": "https://arxiv.org/abs/1706.03762",
+      "note": ": The paper that started the Transformer/LLM revolution."
+    },
+    {
+      "group": "The Fundamental Whitepapers",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models (2023)",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "note": ": The logic behind how Agentic systems (like Google ADK) actually work."
+    },
+    {
+      "group": "Podcasts: Learning on the Go",
+      "title": "Latent Space",
+      "url": "https://www.latent.space/",
+      "note": ": The best podcast for the \"AI Engineer\" era. Deep dives into RAG, Agents, and Evals."
+    },
+    {
+      "group": "Podcasts: Learning on the Go",
+      "title": "The Cognitive Revolution",
+      "url": "https://www.cognitiverevolution.ai/",
+      "note": ": Interviews with the people actually building the frontier models you will be deploying."
+    },
+    {
+      "group": "Podcasts: Learning on the Go",
+      "title": "Software Engineering Daily",
+      "url": "https://softwareengineeringdaily.com/",
+      "note": ": Search their archives for \"GCP,\" \"Palantir,\" or \"Distributed Systems\"."
+    },
+    {
+      "group": "Podcasts: Learning on the Go",
+      "title": "The Data Engineering Podcast",
+      "url": "https://www.dataengineeringpodcast.com/",
+      "note": ": Vital for staying updated on the \"Modern Data Stack\"."
+    },
+    {
+      "group": "Newsletters: The Daily Pulse",
+      "title": "Import AI (Jack Clark)",
+      "url": "https://jack-clark.net/",
+      "note": ": A weekly summary of AI progress and—crucially—AI policy/safety."
+    },
+    {
+      "group": "Newsletters: The Daily Pulse",
+      "title": "GCP Weekly",
+      "url": "https://www.gcpweekly.com/",
+      "note": ": A non-official but highly curated list of every update in the Google Cloud ecosystem."
+    },
+    {
+      "group": "Newsletters: The Daily Pulse",
+      "title": "Interconnects (Nathan Lambert)",
+      "url": "https://www.interconnects.ai/",
+      "note": ": Deep technical analysis of LLM training and alignment."
+    },
+    {
+      "group": "Newsletters: The Daily Pulse",
+      "title": "The Pragmatic Engineer",
+      "url": "https://blog.pragmaticengineer.com/",
+      "note": ": Insights into how big tech companies actually operate and ship software."
+    },
+    {
+      "group": "Newsletters: The Daily Pulse",
+      "title": "The AI Engineer (Paolo Perrone)",
+      "url": "https://theaiengineer.substack.com/",
+      "note": ": Weekly deep dives on production LLM inference: model selection, cost and latency tradeoffs, and the serving failure modes that surface when a demo meets a client's hardware."
+    },
+    {
+      "group": "High-Signal Blogs",
+      "title": "The Morning Paper (Archive)",
+      "url": "https://blog.acolyer.org/",
+      "note": ": A fantastic archive of CS paper summaries."
+    },
+    {
+      "group": "High-Signal Blogs",
+      "title": "Eugene Yan’s Blog",
+      "url": "https://eugeneyan.com/",
+      "note": ": Incredible deep dives on building production-grade ML and Recommendation systems."
+    },
+    {
+      "group": "High-Signal Blogs",
+      "title": "Keeping-Learning",
+      "url": "https://github.com/pierpaolo28/Keeping-Learning",
+      "note": ": List of useful resources about Data, AI & Cloud."
+    }
+  ],
+  "checklist": [
+    {
+      "group": "Administrative & Political",
+      "term": "The \"Champion\"",
+      "detail": "Who is the internal person fighting for this project?"
+    },
+    {
+      "group": "Administrative & Political",
+      "term": "The \"Blocker\"",
+      "detail": "Which department (usually IT or Legal) is most likely to stop us?"
+    },
+    {
+      "group": "Administrative & Political",
+      "term": "The Success Metric",
+      "detail": "Is success \"Lower Latency,\" \"Higher Accuracy,\" or \"Headcount Reduction\"?"
+    },
+    {
+      "group": "Data & Security",
+      "term": "Classification",
+      "detail": "Is the data PII, PHI, or Secret?"
+    },
+    {
+      "group": "Data & Security",
+      "term": "Ingestion",
+      "detail": "Is the data \"Streaming\" (Pub/Sub) or \"Batch\" (BigQuery transfers)?"
+    },
+    {
+      "group": "Data & Security",
+      "term": "Compliance",
+      "detail": "Do we need VPC Service Controls or Data Loss Prevention (DLP) masking?"
+    },
+    {
+      "group": "Infrastructure (The GCP Lens)",
+      "term": "Access",
+      "detail": "Do we have Project Editor or Owner roles in the Google Cloud Project?"
+    },
+    {
+      "group": "Infrastructure (The GCP Lens)",
+      "term": "Connectivity",
+      "detail": "Is this a Private GKE cluster? Do we need a Cloud VPN or Interconnect?"
+    },
+    {
+      "group": "Infrastructure (The GCP Lens)",
+      "term": "Quotas",
+      "detail": "Does the client have enough GPU quota (A100/H100) for the models we plan to deploy?"
+    }
+  ],
+  "sections": [
+    {
+      "title": "The FDE Persona & Mission",
+      "links": 14
+    },
+    {
+      "title": "The Applied AI & Technical Playbook",
+      "links": 27
+    },
+    {
+      "title": "Air-Gapped & Tactical Edge Deployment",
+      "links": 25
+    },
+    {
+      "title": "The \"Soft Stack\": Consulting & Strategy",
+      "links": 5
+    },
+    {
+      "title": "The Interview Blackbook & Case Studies",
+      "links": 4
+    },
+    {
+      "title": "Artifact Templates (Copy-Paste)",
+      "links": 0
+    },
+    {
+      "title": "Weekly Executive Summary: [Project Name]",
+      "links": 0
+    },
+    {
+      "title": "Comprehensive Reading List",
+      "links": 21
+    },
+    {
+      "title": "The FDE Glossary",
+      "links": 0
+    },
+    {
+      "title": "Interactive Field Manual",
+      "links": 1
+    }
+  ],
+  "stats": {
+    "templates": 4,
+    "glossary": 22,
+    "resources": 21,
+    "checklist": 9,
+    "sections": 10
+  }
+}

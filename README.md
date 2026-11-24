@@ -28,6 +28,7 @@ FDEs are the "Technical Special Ops" who bridge the gap (The Delta) between a co
 9. [**The FDE Glossary**](#-the-fde-glossary)
 10. [**Creators**](#%E2%80%8D-creators)
 11. [**Contributing**](#-contributing)
+12. [**Interactive Field Manual**](#-interactive-field-manual)
 
 ---
 
@@ -617,6 +618,20 @@ Being a "Forward" engineer means staying six months ahead of the industry. This 
 *   **Cost of Inaction (CoI):** A strategic argument used to drive projects forward by quantifying how much money/efficiency the client loses every day they *don't* deploy the solution.
 *   **UAT (User Acceptance Testing):** The "moment of truth" where actual client employees use the tool. If they don't "accept" it, the project isn't done, regardless of how good the code is.
 *   **Day 2 Operations:** Everything that happens after the FDE leaves. Includes monitoring, retraining models, and training the client's internal "Run Team".
+
+---
+
+## 🌐 Interactive Field Manual
+
+A bilingual, interactive front end for this roadmap lives in [`web/`](web/). It turns the curriculum, artifact templates, glossary and reading list into a step-by-step learning workspace with animated isometric diagrams, progress tracking and field drills.
+
+```sh
+cd web
+npm install
+npm run dev
+```
+
+The interface is a design study of [Designed to Scale](https://designed-to-scale.vercel.app/#/) by Dilum Sanjaya; all lesson prose, diagrams and code here are independently authored. Content in `web/src/data/roadmap.json` is generated directly from this `README.md`. See [`web/README.md`](web/README.md) for commands, features and the project map.
 
 ---
 
